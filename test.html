@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Camera Example</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; }
+        h1 {
+            text-align: center;
+            margin-top: 10px;
+            color: #FF69B4;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        #buttonContainer {
+            position: absolute; 
+            top: 50px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            display: flex; 
+            flex-direction: row; 
+            gap: 10px; /* ボタン間の隙間 */
+            z-index: 999; 
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        #arButton { background-color: #FF69B4; }
+        #scaleDownButton { background-color: #FFB6C1; }
+        #switchModelButton { background-color: #FF69B4; }
+        #resetButton { background-color: #FFB6C1; }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>ARFiT</h1>
+    <div id="buttonContainer">
+        <button id="arButton">ARカメラを起動</button>
+        <button id="scaleDownButton">サイズを小さくする</button>
+        <button id="switchModelButton">メガネに切り替える</button>
+        <button id="resetButton">元に戻る</button>
+    </div>
+
+    <a-scene embedded arjs>
+        <a-entity id="model" gltf-model="http://localhost:8000/model/Sneakers_like_Convers_0925052456_refine.gltf" position="0 0 -3" scale="0.25 0.25 0.25"></a-entity>
+    </a-scene>
+
+    <script>
+        const arButton = document.getElementById('arButton');
+        const scaleDownButton = document.getElementById('scaleDownButton');
+        const switchModelButton = document.getElementById('switchModelButton');
+        const resetButton = document.getElementById('resetButton');
+        const model = document.getElementById('model');
+        const header = document.querySelector('h1'); // ヘッダーを取得
+
+        // ARカメラの起動
+        arButton.addEventListener('click', () => {
+            header.style.display = 'none'; // ヘッダーを非表示
+            document.querySelector('a-scene').enterXR();
+        });
+
+        // モデルのサイズを小さくする
+        scaleDownButton.addEventListener('click', () => {
+            const currentScale = model.getAttribute('scale');
+            model.setAttribute('scale', {
+                x: currentScale.x * 0.9,
+                y: currentScale.y * 0.9,
+                z: currentScale.z * 0.9
+            });
+        });
+
+        // モデルの切り替え（スニーカー ⇔ メガネ）
+        let isSneaker = true;
+        switchModelButton.addEventListener('click', () => {
+            if (isSneaker) {
+                model.setAttribute('gltf-model', 'http://localhost:8000/model/黒縁のボストン_0926065038_preview.gltf');
+                switchModelButton.textContent = 'スニーカーに切り替える';
+            } else {
+                model.setAttribute('gltf-model', 'http://localhost:8000/model/Sneakers_like_Convers_0925052456_refine.gltf');
+                switchModelButton.textContent = 'メガネに切り替える';
+            }
+            isSneaker = !isSneaker;
+        });
+
+        // 元に戻る（スニーカーに戻し、サイズと位置もリセット）
+        resetButton.addEventListener('click', () => {
+            // モデルをスニーカーに戻す
+            model.setAttribute('gltf-model', 'http://localhost:8000/model/Sneakers_like_Convers_0925052456_refine.gltf');
+            // スケールと位置を初期状態に戻す
+            model.setAttribute('scale', '0.25 0.25 0.25'); // スケールを半分に変更
+            model.setAttribute('position', '0 0 -3');
+            // ボタンの表示も元に戻す
+            switchModelButton.textContent = 'メガネに切り替える';
+            isSneaker = true;  // モデルの状態をリセット
+        });
+
+        // ARセッション終了時にヘッダーを再表示
+        document.querySelector('a-scene').addEventListener('exit-vr', () => {
+            header.style.display = 'block'; // ヘッダーを表示
+        });
+    </script>
+</body>
+</html>
