@@ -50,8 +50,8 @@
         <button id="resetButton">元に戻る</button>
     </div>
 
-    <a-scene embedded arjs>
-        <a-entity id="model" gltf-model="http://localhost:8000/model/Sneakers_like_Convers_0925052456_refine.gltf" position="0 0 -3" scale="0.25 0.25 0.25"></a-entity>
+    <a-scene embedded arjs id="arScene" style="display: none;">
+        <a-entity id="model" gltf-model="model/Sneakers_like_Convers_0925052456_refine.gltf" position="0 0 -3" scale="0.25 0.25 0.25"></a-entity>
     </a-scene>
 
     <script>
@@ -61,11 +61,13 @@
         const resetButton = document.getElementById('resetButton');
         const model = document.getElementById('model');
         const header = document.querySelector('h1'); // ヘッダーを取得
+        const arScene = document.getElementById('arScene');
 
         // ARカメラの起動
         arButton.addEventListener('click', () => {
             header.style.display = 'none'; // ヘッダーを非表示
-            document.querySelector('a-scene').enterXR();
+            arScene.style.display = 'block'; // ARシーンを表示
+            arScene.enterXR(); // ARシーンを開始
         });
 
         // モデルのサイズを小さくする
@@ -82,10 +84,10 @@
         let isSneaker = true;
         switchModelButton.addEventListener('click', () => {
             if (isSneaker) {
-                model.setAttribute('gltf-model', 'http://localhost:8000/model/黒縁のボストン_0926065038_preview.gltf');
+                model.setAttribute('gltf-model', 'model/黒縁のボストン_0926065038_preview.gltf');
                 switchModelButton.textContent = 'スニーカーに切り替える';
             } else {
-                model.setAttribute('gltf-model', 'http://localhost:8000/model/Sneakers_like_Convers_0925052456_refine.gltf');
+                model.setAttribute('gltf-model', 'model/Sneakers_like_Convers_0925052456_refine.gltf');
                 switchModelButton.textContent = 'メガネに切り替える';
             }
             isSneaker = !isSneaker;
@@ -94,9 +96,9 @@
         // 元に戻る（スニーカーに戻し、サイズと位置もリセット）
         resetButton.addEventListener('click', () => {
             // モデルをスニーカーに戻す
-            model.setAttribute('gltf-model', 'http://localhost:8000/model/Sneakers_like_Convers_0925052456_refine.gltf');
+            model.setAttribute('gltf-model', 'model/Sneakers_like_Convers_0925052456_refine.gltf');
             // スケールと位置を初期状態に戻す
-            model.setAttribute('scale', '0.25 0.25 0.25'); // スケールを半分に変更
+            model.setAttribute('scale', '0.25 0.25 0.25'); // スケールを初期状態に戻す
             model.setAttribute('position', '0 0 -3');
             // ボタンの表示も元に戻す
             switchModelButton.textContent = 'メガネに切り替える';
@@ -106,6 +108,7 @@
         // ARセッション終了時にヘッダーを再表示
         document.querySelector('a-scene').addEventListener('exit-vr', () => {
             header.style.display = 'block'; // ヘッダーを表示
+            arScene.style.display = 'none'; // ARシーンを非表示
         });
     </script>
 </body>
